@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- ol -->
+    <!-- <link rel="stylesheet" href="/gis/ol/ol.css" type="text/css">
+    <script type="text/javascript" src="/gis/ol/ol.js"></script> -->
+
+    <link rel="stylesheet" href="https://openlayers.org/en/v6.1.1/css/ol.css" />
+    <script src="https://openlayers.org/en/v6.1.1/build/ol.js"></script>
+
+    <!-- ol-ext -->
+    <link rel="stylesheet" href="/gis/ol-ext/ol-ext.min.css" />
+    <script type="text/javascript" src="/gis/ol-ext/ol-ext.min.js"></script>
+
+    <link rel="stylesheet" href="/gis/ol-ext/styles/style.css" />
+    <link rel="stylesheet" href="/gis/ol-ext/styles/css/fontmaki.css" />
+    <link rel="stylesheet" href="/gis/ol-ext/styles/css/fontmaki2.css" />
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+    <!-- ol-ext maki and fontawesome defintions used in fontsymbol -->
+    <script type="text/javascript" src="/gis/ol-ext/extra/FontMakiDef.js"></script>
+    <script type="text/javascript" src="/gis/ol-ext/extra/FontMaki2Def.js"></script>
+    <script type="text/javascript" src="/gis/ol-ext/extra/FontAwesomeDef.js"></script>
+
+    <link rel="stylesheet" href="/gis/ol-layerswitcher/ol-layerswitcher.css" />
+    <script src="/gis/ol-layerswitcher/ol-layerswitcher.js"></script>
+
+    <link rel="stylesheet" href="/gis/ol3-sidebar/ol3-sidebar.css" />
+    <script src="/gis/ol3-sidebar/ol3-sidebar.js"></script>
+
+    <link rel="stylesheet" href="/gis/ol-layerswitcher/sidebar.css" />
+
+    <!-- <link rel="stylesheet" href="/gis/ol-layerswitcher/layerswitcher.css" /> -->
+    <!-- <script src="/gis/ol-layerswitcher/layerswitcher.js"></script> -->
+
+    <link href="https://unpkg.com/ol-contextmenu/dist/ol-contextmenu.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/ol-contextmenu"></script>
+
+    <style>
+        .options i.standard,
+        .options .fa {
+            height: 1em;
+            margin: 0;
+            padding: 0.5em;
+            width: 1em;
+            cursor: pointer;
+        }
+
+        .options i.standard,
+        .options .fa:before {
+            margin: 0;
+            border: 1px solid transparent;
+            display: inline-block;
+            height: 1em;
+            width: 1em;
+            text-align: center;
+            padding: 2px;
+        }
+
+        .options i.standard {
+            font-style: normal;
+            font-weight: bold;
+            font-family: sherif;
+            padding-bottom: 0.1em;
+            line-height: 0.9em;
+            margin-left: 0.35em;
+        }
+
+        .options i.standard:hover,
+        .options .fa:hover:before {
+            border: 1px solid #369;
+            border-radius: 100%;
+            transform: scale(3);
+            -webkit-transform: scale(3);
+            background: #fff;
+        }
+
+        .ol-popup h1 {
+            font-size: 1em;
+            background-size: 2em;
+            padding-left: 3em;
+        }
+    </style>
+
+    <title>Info Lab Testbed</title>
+</head>
+
+<body>
+    <!-- START OF SIDEBAR DIV -->
+    <div id="sidebar" class="sidebar collapsed">
+
+        <!-- Nav tabs -->
+        <div class="sidebar-tabs">
+            <ul role="tablist">
+                <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
+                <li><a href="#profile" role="tab"><i class="fa fa-user"></i></a></li>
+                <li class="disabled"><a href="#messages" role="tab"><i class="fa fa-envelope"></i></a></li>
+                <li><a href="https://github.com/Turbo87/sidebar-v2" role="tab" target="_blank"><i
+                            class="fa fa-github"></i></a></li>
+            </ul>
+
+            <ul role="tablist">
+                <li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
+            </ul>
+        </div>
+
+        <!-- Tab panes -->
+        <div class="sidebar-content" style="width: 300px;">
+            <div class="sidebar-pane" id="home">
+                <h2 class="sidebar-header">
+                    Layers
+                    <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                </h2>
+                <!-- !!! HERE WILL GO THE CONTENT OF LAYERSWITCHER !!! -->
+                <div id="layers" class="layer-switcher"></div>
+            </div>
+
+            <div class="sidebar-pane" id="profile">
+                <h2 class="sidebar-header">Profile<span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                </h2>
+            </div>
+
+            <div class="sidebar-pane" id="messages">
+                <h2 class="sidebar-header">Messages<span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                </h2>
+            </div>
+
+            <div class="sidebar-pane" id="settings">
+                <h2 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+                </h2>
+            </div>
+        </div>
+    </div>
+    <!-- END OF SIDEBAR DIV -->
+
+    <!-- DIV pour la carte -->
+    <div id="map" class="sidebar-map"></div>
+
+    <script type="text/javascript">
+        var geo;
+
+        $.ajax({
+            dataType: 'json',
+            url: 'http://localhost:3000/data/info.geojson',
+            type: 'GET',
+            async: false,
+            success: function (result) {
+                geo = result;
+            }
+        });
+
+        var filtered_car = {
+            "type": "FeatureCollection",
+            "features": []
+        };
+
+        var filtered_bus = {
+            "type": "FeatureCollection",
+            "features": []
+        };
+
+        var filtered_truck = {
+            "type": "FeatureCollection",
+            "features": []
+        };
+
+        var filtered_trafficLight = {
+            "type": "FeatureCollection",
+            "features": []
+        };
+
+        var car_coords = new Array();
+        var bus_coords = new Array();
+        var truck_coords = new Array();
+        var trafficLight_coords = new Array();
+
+        geo.features.forEach(function (feature) {
+            if (feature.properties.annotationJSON.className == "car") {
+                filtered_car.features.push(feature);
+                car_coords.push(feature.geometry.coordinates);
+            } else if (feature.properties.annotationJSON.className == "bus") {
+                filtered_bus.features.push(feature);
+                bus_coords.push(feature.geometry.coordinates);
+            } else if (feature.properties.annotationJSON.className == "truck") {
+                filtered_truck.features.push(feature);
+                truck_coords.push(feature.geometry.coordinates);
+            } else if (feature.properties.annotationJSON.className == "traffic_light") {
+                filtered_trafficLight.features.push(feature);
+                trafficLight_coords.push(feature.geometry.coordinates);
+            }
+        });
+
+        var carFeature = new ol.Feature();
+        carFeature.setGeometry(car_coords ?
+            new ol.geom.LineString(car_coords) : null);
+
+        var busFeature = new ol.Feature();
+        busFeature.setGeometry(bus_coords ?
+            new ol.geom.LineString(bus_coords) : null);
+
+        var truckFeature = new ol.Feature();
+        truckFeature.setGeometry(truck_coords ?
+            new ol.geom.LineString(truck_coords) : null);
+
+        var trafficLightFeature = new ol.Feature();
+        trafficLightFeature.setGeometry(trafficLight_coords ?
+            new ol.geom.LineString(trafficLight_coords) : null);
+
+        // GeoJSON layer
+        var vs_car = new ol.source.Vector({
+            features: (new ol.format.GeoJSON()).readFeatures(filtered_car)
+        });
+
+        var vs_bus = new ol.source.Vector({
+            features: (new ol.format.GeoJSON()).readFeatures(filtered_bus)
+        });
+
+        var vs_truck = new ol.source.Vector({
+            features: (new ol.format.GeoJSON()).readFeatures(filtered_truck)
+        });
+
+        var vs_trafficLight = new ol.source.Vector({
+            features: (new ol.format.GeoJSON()).readFeatures(filtered_trafficLight)
+        });
+
+        var styles = {
+            'bus': new ol.style.Style({
+                image: new ol.style.FontSymbol({
+                    form: "poi", //"hexagone", 
+                    glyph: "fa-bus",
+                    fontSize: 1,
+                    radius: 20,
+                    color: "white",
+                    fill: new ol.style.Fill({
+                        color: "green"
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: "white",
+                        width: 1
+                    })
+                }),
+                stroke: new ol.style.Stroke({
+                    width: 2,
+                    color: '#f80'
+                }),
+                fill: new ol.style.Fill({
+                    color: [255, 136, 0, 0.6]
+                })
+            }),
+            'truck': new ol.style.Style({
+                image: new ol.style.FontSymbol({
+                    form: "poi", //"hexagone", 
+                    glyph: "fa-truck",
+                    fontSize: 1,
+                    radius: 20,
+                    color: "white",
+                    fill: new ol.style.Fill({
+                        color: "#c4f71b"
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: "white",
+                        width: 1
+                    })
+                }),
+                stroke: new ol.style.Stroke({
+                    width: 2,
+                    color: '#f80'
+                }),
+                fill: new ol.style.Fill({
+                    color: [255, 136, 0, 0.6]
+                })
+            }),
+            'car': new ol.style.Style({
+                image: new ol.style.FontSymbol({
+                    form: "poi", //"hexagone",
+                    glyph: "fa-car",
+                    fontSize: 1,
+                    radius: 20,
+                    color: "white",
+                    fill: new ol.style.Fill({
+                        color: "navy"
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: "white",
+                        width: 1
+                    })
+                }),
+                stroke: new ol.style.Stroke({
+                    width: 2,
+                    color: '#f80'
+                }),
+                fill: new ol.style.Fill({
+                    color: [255, 136, 0, 0.6]
+                })
+            }),
+            'traffic_light': new ol.style.Style({
+                image: new ol.style.FontSymbol({
+                    form: "poi", //"hexagone",
+                    glyph: "fa-tree",
+                    fontSize: 1,
+                    radius: 20,
+                    color: "white",
+                    fill: new ol.style.Fill({
+                        color: "red"
+                    }),
+                    stroke: new ol.style.Stroke({
+                        color: "white",
+                        width: 1
+                    })
+                }),
+                stroke: new ol.style.Stroke({
+                    width: 2,
+                    color: '#f80'
+                }),
+                fill: new ol.style.Fill({
+                    color: [255, 136, 0, 0.6]
+                })
+            })
+        };
+
+        var styleFunction = function (feature) {
+            return styles[feature.getProperties().annotationJSON.className];
+        };
+
+        var view = new ol.View({
+            projection: 'EPSG:4326',
+            center: [126.6859277687662, 35.94262676858626],
+            zoom: 18
+        });
+
+        var map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Group({
+                    // A layer must have a title to appear in the layerswitcher
+                    title: 'Water color with labels',
+                    // Setting the layers type to 'base' results
+                    // in it having a radio button and only one
+                    // base layer being visibile at a time
+                    type: 'base',
+                    // Setting combine to true causes sub-layers to be hidden
+                    // in the layerswitcher, only the parent is shown
+                    combine: true,
+                    visible: false,
+                    layers: [
+                        new ol.layer.Tile({
+                            source: new ol.source.Stamen({
+                                layer: 'watercolor'
+                            })
+                        }),
+                        new ol.layer.Tile({
+                            source: new ol.source.Stamen({
+                                layer: 'terrain-labels'
+                            })
+                        })
+                    ]
+                }),
+                new ol.layer.Tile({
+                    // A layer must have a title to appear in the layerswitcher
+                    title: 'Water color',
+                    // Again set this layer as a base layer
+                    type: 'base',
+                    visible: false,
+                    source: new ol.source.Stamen({
+                        layer: 'watercolor'
+                    })
+                }),
+                new ol.layer.Tile({
+                    // A layer must have a title to appear in the layerswitcher
+                    title: 'OSM',
+                    // Again set this layer as a base layer
+                    type: 'base',
+                    visible: true,
+                    source: new ol.source.OSM()
+                }),
+                new ol.layer.Group({
+                    // A layer must have a title to appear in the layerswitcher
+                    title: 'Overlays',
+                    // Adding a 'fold' property set to either 'open' or 'close' makes the group layer
+                    // collapsible
+                    fold: 'open',
+                    layers: [
+                        new ol.layer.Group({
+                            title: 'Car',
+                            // Adding a 'fold' property set to either 'open' or 'close' makes the group layer
+                            // collapsible
+                            fold: 'open',
+                            layers: [
+                                new ol.layer.Vector({
+                                    title: 'POI',
+                                    visible: true,
+                                    zIndex: 100,
+                                    renderOrder: ol.ordering.yOrdering(),
+                                    style: styleFunction,
+                                    source: vs_car
+                                }),
+                                new ol.layer.Vector({
+                                    title: 'Line',
+                                    visible: true,
+                                    zIndex: 50,
+                                    style: new ol.style.Style({                                        
+                                        stroke: new ol.style.Stroke({
+                                            width: 3,
+                                            color: [0, 0, 153, 0.3]
+                                        })
+                                    }),
+                                    source: new ol.source.Vector({
+                                        features: [carFeature]
+                                    })
+                                })
+                            ]
+                        }),
+                        new ol.layer.Group({
+                            title: 'Bus',
+                            // Adding a 'fold' property set to either 'open' or 'close' makes the group layer
+                            // collapsible
+                            fold: 'open',
+                            layers: [
+                                new ol.layer.Vector({
+                                    title: 'POI',
+                                    visible: true,
+                                    zIndex: 100,
+                                    renderOrder: ol.ordering.yOrdering(),
+                                    style: styleFunction,
+                                    source: vs_bus
+                                }),
+                                new ol.layer.Vector({
+                                    title: 'Line',
+                                    visible: true,
+                                    zIndex: 50,
+                                    style: new ol.style.Style({                                        
+                                        stroke: new ol.style.Stroke({
+                                            width: 3,
+                                            color: [0, 255, 0, 0.3]
+                                        })
+                                    }),
+                                    source: new ol.source.Vector({
+                                        features: [busFeature]
+                                    })
+                                })
+                            ]
+                        }),
+                        new ol.layer.Group({
+                            title: 'Truck',
+                            // Adding a 'fold' property set to either 'open' or 'close' makes the group layer
+                            // collapsible
+                            fold: 'open',
+                            layers: [
+                                new ol.layer.Vector({
+                                    title: 'POI',
+                                    visible: true,
+                                    zIndex: 100,
+                                    renderOrder: ol.ordering.yOrdering(),
+                                    style: styleFunction,
+                                    source: vs_truck
+                                }),
+                                new ol.layer.Vector({
+                                    title: 'Line',
+                                    visible: true,
+                                    zIndex: 50,
+                                    style: new ol.style.Style({                                        
+                                        stroke: new ol.style.Stroke({
+                                            width: 3,
+                                            color: [204, 255, 0, 0.5]
+                                        })
+                                    }),
+                                    source: new ol.source.Vector({
+                                        features: [truckFeature]
+                                    })
+                                })
+                            ]
+                        }),
+                        new ol.layer.Group({
+                            title: 'Traffic-Light',
+                            // Adding a 'fold' property set to either 'open' or 'close' makes the group layer
+                            // collapsible
+                            fold: 'open',
+                            layers: [
+                                new ol.layer.Vector({
+                                    title: 'POI',
+                                    visible: true,
+                                    zIndex: 100,
+                                    renderOrder: ol.ordering.yOrdering(),
+                                    style: styleFunction,
+                                    source: vs_trafficLight
+                                }),
+                                new ol.layer.Vector({
+                                    title: 'LineString',
+                                    visible: true,
+                                    zIndex: 50,
+                                    style: new ol.style.Style({                                        
+                                        stroke: new ol.style.Stroke({
+                                            width: 3,
+                                            color: [255, 0, 0, 0.3]
+                                        })
+                                    }),
+                                    source: new ol.source.Vector({
+                                        features: [trafficLightFeature]
+                                    })
+                                })
+                            ]
+                        }),
+
+
+
+                    ]
+                })
+            ],
+            view: view
+        });
+
+
+        // var layerSwitcher = new ol.control.LayerSwitcher({
+        //     tipLabel: 'Légende', // Optional label for button
+        //     groupSelectStyle: 'children' // Can be 'children' [default], 'group' or 'none'
+        // });
+        var sidebar = new ol.control.Sidebar({ element: 'sidebar', position: 'left' });
+        var toc = document.getElementById("layers");
+        ol.control.LayerSwitcher.renderPanel(map, toc);
+        map.addControl(sidebar);
+
+        var contextmenu_items = [
+            {
+                text: 'Center map here',
+                classname: 'bold',
+                icon: '/images/center.png',
+                callback: center,
+            },
+            {
+                text: 'Some Actions',
+                icon: '/images/view_list.png',
+                items: [
+                    {
+                        text: 'Center map here',
+                        icon: '/images/center.png',
+                        callback: center,
+                    },
+                    {
+                        text: 'Add a Marker',
+                        icon: '/images/pin_drop.png',
+                        callback: marker,
+                    },
+                ],
+            },
+            {
+                text: 'Add a Marker',
+                icon: '/images/pin_drop.png',
+                callback: marker,
+            },
+            '-', // this is a separator
+        ];
+
+        // var removeMarkerItem = {
+        //     text: 'Remove this Marker',
+        //     classname: 'marker',
+        //     callback: removeMarker,
+        // };
+
+        var contextmenu = new ContextMenu({
+            width: 180,
+            items: contextmenu_items,
+        });
+        map.addControl(contextmenu);
+
+        // from https://github.com/DmitryBaranovskiy/raphael
+        function elastic(t) {
+            return (
+                Math.pow(2, -10 * t) * Math.sin(((t - 0.075) * (2 * Math.PI)) / 0.3) + 1
+            );
+        }
+
+        function center(obj) {
+            view.animate({
+                duration: 700,
+                easing: elastic,
+                center: obj.coordinate,
+            });
+        }
+
+        function removeMarker(obj) {
+            vectorLayer.getSource().removeFeature(obj.data.marker);
+        }
+
+        function marker(obj) {
+            var coord4326 = ol.proj.transform(obj.coordinate, 'EPSG:3857', 'EPSG:4326'),
+                template = 'Coordinate is ({x} | {y})',
+                iconStyle = new ol.style.Style({
+                    image: new ol.style.Icon({ scale: 0.6, src: 'img/pin_drop.png' }),
+                    text: new ol.style.Text({
+                        offsetY: 25,
+                        text: ol.coordinate.format(coord4326, template, 2),
+                        font: '15px Open Sans,sans-serif',
+                        fill: new ol.style.Fill({ color: '#111' }),
+                        stroke: new ol.style.Stroke({ color: '#eee', width: 2 }),
+                    }),
+                }),
+                feature = new ol.Feature({
+                    type: 'removable',
+                    geometry: new ol.geom.Point(obj.coordinate),
+                });
+
+            feature.setStyle(iconStyle);
+            vectorLayer.getSource().addFeature(feature);
+        }
+
+
+
+
+
+        // var vector = new ol.layer.Vector({
+        //     // name: '1914-18',
+        //     // preview: "http://www.culture.gouv.fr/Wave/image/memoire/2445/sap40_z0004141_v.jpg",
+        //     source: vectorSource,
+        //     // y ordering
+        //     renderOrder: ol.ordering.yOrdering(),
+        //     // style: getStyle
+        //     style: styleFunction
+        // })
+
+        // map.addLayer(vector);
+
+
+        // Select  interaction
+        var select = new ol.interaction.Select({
+            hitTolerance: 5,
+            multi: false,
+            condition: ol.events.condition.singleClick
+        });
+        map.addInteraction(select);
+
+        // Select control
+        var popup = new ol.Overlay.PopupFeature({
+            popupClass: 'default anim',
+            select: select,
+            canFix: true,
+            template: {
+                title:
+                    function (f) {
+                        return f.get('annotationJSON')['className'] + ' (' + f.get('id') + ')';
+                    },
+                attributes:
+                {
+                    'model': {
+                        title: 'model',
+                        format: function (val, f) {
+                            return f.get('annotationJSON')['model']
+                        }
+                    },
+                    'classId': {
+                        title: 'classId',
+                        format: function (val, f) {
+                            return f.get('annotationJSON')['classId']
+                        }
+                    },
+                    'className': {
+                        title: 'className',
+                        format: function (val, f) {
+                            return f.get('annotationJSON')['className']
+                        }
+                    },
+                    'width': {
+                        title: 'width',
+                        format: function (val, f) {
+                            return f.get('width')
+                        }
+                    },
+                    'height': {
+                        title: 'height',
+                        format: function (val, f) {
+                            return f.get('height')
+                        }
+                    }
+                }
+            }
+        });
+        map.addOverlay(popup);
+
+
+
+    </script>
+
+
+</body>
+
+</html>
