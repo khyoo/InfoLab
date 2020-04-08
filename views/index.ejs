@@ -143,11 +143,13 @@
     <div id="map" class="sidebar-map"></div>
 
     <script type="text/javascript">
+        var geoURL = '<%= geourl %>';
+        // var geoURL = '/data/info.geojson';
         var geo;
 
         $.ajax({
             dataType: 'json',
-            url: 'http://info.khyoo1221.com:3000/data/info.geojson',
+            url: geoURL,
             type: 'GET',
             async: false,
             success: function (result) {
