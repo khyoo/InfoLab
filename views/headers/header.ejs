@@ -1,0 +1,91 @@
+<head>
+    <!-- ol -->
+    <!-- <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+    <script src="https://openlayers.org/en/v4.6.5/build/ol.js" type="text/javascript"></script> -->
+
+    <link rel="stylesheet" href="https://openlayers.org/en/v6.1.1/css/ol.css" />
+    <script src="https://openlayers.org/en/v6.1.1/build/ol.js"></script>
+
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList"></script>
+    
+    <!-- ol-ext -->
+    <link rel="stylesheet" href="/gis/ol-ext/ol-ext.min.css" />
+    <script type="text/javascript" src="/gis/ol-ext/ol-ext.min.js"></script>
+
+    <!-- <link rel="stylesheet" href="/gis/ol-ext/styles/style.css" /> -->
+    <link rel="stylesheet" href="/gis/ol-ext/styles/css/fontmaki.css" />
+    <link rel="stylesheet" href="/gis/ol-ext/styles/css/fontmaki2.css" />
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+    <!-- ol-ext maki and fontawesome defintions used in fontsymbol -->
+    <script type="text/javascript" src="/gis/ol-ext/extra/FontMakiDef.js"></script>
+    <script type="text/javascript" src="/gis/ol-ext/extra/FontMaki2Def.js"></script>
+    <script type="text/javascript" src="/gis/ol-ext/extra/FontAwesomeDef.js"></script>
+
+    <script src="https://unpkg.com/ol-layerswitcher@3.5.0"></script>
+    <link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@3.5.0/src/ol-layerswitcher.css" />
+    <!-- <link rel="stylesheet" href="/gis/ol-layerswitcher/ol-layerswitcher.css" />    
+    <script src="/gis/ol-layerswitcher/ol-layerswitcher.js"></script> -->
+
+    <link rel="stylesheet" href="/gis/ol3-sidebar/ol3-sidebar.css" />
+    <script src="/gis/ol3-sidebar/ol3-sidebar.js"></script>
+
+    <link rel="stylesheet" href="/gis/ol-layerswitcher/sidebar.css" />
+
+    <!-- <link rel="stylesheet" href="/gis/ol-layerswitcher/layerswitcher.css" /> -->
+    <!-- <script src="/gis/ol-layerswitcher/layerswitcher.js"></script> -->
+
+    <link href="https://unpkg.com/ol-contextmenu/dist/ol-contextmenu.min.css" rel="stylesheet">
+    <script src="https://unpkg.com/ol-contextmenu"></script>
+
+    <style>
+        .options i.standard,
+        .options .fa {
+            height: 1em;
+            margin: 0;
+            padding: 0.5em;
+            width: 1em;
+            cursor: pointer;
+        }
+
+        .options i.standard,
+        .options .fa:before {
+            margin: 0;
+            border: 1px solid transparent;
+            display: inline-block;
+            height: 1em;
+            width: 1em;
+            text-align: center;
+            padding: 2px;
+        }
+
+        .options i.standard {
+            font-style: normal;
+            font-weight: bold;
+            font-family: sherif;
+            padding-bottom: 0.1em;
+            line-height: 0.9em;
+            margin-left: 0.35em;
+        }
+
+        .options i.standard:hover,
+        .options .fa:hover:before {
+            border: 1px solid #369;
+            border-radius: 100%;
+            transform: scale(3);
+            -webkit-transform: scale(3);
+            background: #fff;
+        }
+
+        .ol-popup h1 {
+            font-size: 1em;
+            background-size: 2em;
+            padding-left: 3em;
+        }
+    </style>
+</head>
