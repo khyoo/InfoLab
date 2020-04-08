@@ -100,8 +100,8 @@
             <ul role="tablist">
                 <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
                 <li><a href="#profile" role="tab"><i class="fa fa-user"></i></a></li>
-                <li class="disabled"><a href="#messages" role="tab"><i class="fa fa-envelope"></i></a></li>
-                <li><a href="https://github.com/Turbo87/sidebar-v2" role="tab" target="_blank"><i
+                <li><a href="#info" role="tab"><i class="fa fa-info-circle"></i></a></li>
+                <li><a href="https://github.com/khyoo/InfoLab" role="tab" target="_blank"><i
                             class="fa fa-github"></i></a></li>
             </ul>
 
@@ -111,13 +111,12 @@
         </div>
 
         <!-- Tab panes -->
-        <div class="sidebar-content" style="width: 300px;">
+        <div class="sidebar-content" style="width: 300px;word-break: break-all;">
             <div class="sidebar-pane" id="home">
                 <h2 class="sidebar-header">
                     Layers
                     <span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
                 </h2>
-                <!-- !!! HERE WILL GO THE CONTENT OF LAYERSWITCHER !!! -->
                 <div id="layers" class="layer-switcher"></div>
             </div>
 
@@ -126,9 +125,17 @@
                 </h2>
             </div>
 
-            <div class="sidebar-pane" id="messages">
-                <h2 class="sidebar-header">Messages<span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
+            <div class="sidebar-pane" id="info">
+                <h2 class="sidebar-header">사용법<span class="sidebar-close"><i class="fa fa-caret-left"></i></span>
                 </h2>
+                <div id="info_content" class="layer-switcher" style="width: 240px;">
+                    <br> URL 쿼리 : <br>
+                    http://[도메인]:3000/geourl?url=[GeoJson URL]
+                    <br>
+                    <br> 예시 : <br>
+                    <a
+                        href="http://info.khyoo1221.com:3000/geourl?url=http://info.khyoo1221.com:3000/data/info.geojson">http://info.khyoo1221.com:3000/geourl?url=http://info.khyoo1221.com:3000/data/info.geojson</a>
+                </div>
             </div>
 
             <div class="sidebar-pane" id="settings">
@@ -144,7 +151,8 @@
 
     <script type="text/javascript">
         var geoURL = '<%= geourl %>';
-        // var geoURL = '/data/info.geojson';
+        var sampleURL = '/data/info.geojson';
+
         var geo;
 
         $.ajax({
@@ -154,6 +162,18 @@
             async: false,
             success: function (result) {
                 geo = result;
+            },
+            error: function (request, status, error) {
+                alert("URL이 잘못되었습니다. 샘플 화면으로 전환합니다.");
+                $.ajax({
+                    dataType: 'json',
+                    url: sampleURL,
+                    type: 'GET',
+                    async: false,
+                    success: function (result) {
+                        geo = result;
+                    }
+                });
             }
         });
 
@@ -406,7 +426,7 @@
                                     title: 'Line',
                                     visible: true,
                                     zIndex: 50,
-                                    style: new ol.style.Style({                                        
+                                    style: new ol.style.Style({
                                         stroke: new ol.style.Stroke({
                                             width: 3,
                                             color: [0, 0, 153, 0.3]
@@ -436,7 +456,7 @@
                                     title: 'Line',
                                     visible: true,
                                     zIndex: 50,
-                                    style: new ol.style.Style({                                        
+                                    style: new ol.style.Style({
                                         stroke: new ol.style.Stroke({
                                             width: 3,
                                             color: [0, 255, 0, 0.3]
@@ -466,7 +486,7 @@
                                     title: 'Line',
                                     visible: true,
                                     zIndex: 50,
-                                    style: new ol.style.Style({                                        
+                                    style: new ol.style.Style({
                                         stroke: new ol.style.Stroke({
                                             width: 3,
                                             color: [204, 255, 0, 0.5]
@@ -496,7 +516,7 @@
                                     title: 'LineString',
                                     visible: true,
                                     zIndex: 50,
-                                    style: new ol.style.Style({                                        
+                                    style: new ol.style.Style({
                                         stroke: new ol.style.Stroke({
                                             width: 3,
                                             color: [255, 0, 0, 0.3]
